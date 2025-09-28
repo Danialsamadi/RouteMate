@@ -1,0 +1,156 @@
+# 🎯 RouteMate Demo Script
+
+This script outlines how to present the RouteMate project effectively in your presentation.
+
+## 📋 Pre-Demo Checklist
+
+- [ ] Supabase project created with PostGIS enabled
+- [ ] Database table created with sample data
+- [ ] Backend server running (port 5000)
+- [ ] Frontend app running (port 3000)
+- [ ] Google Maps API key configured
+- [ ] All dependencies installed
+
+## 🎬 Demo Flow (10-15 minutes)
+
+### 1. **Project Introduction** (2 minutes)
+- "Today I'll demonstrate how to efficiently store GPS coordinates using PostGIS and visualize them with Google Maps"
+- "This full-stack application shows modern geospatial data handling"
+
+### 2. **Database Architecture** (3 minutes)
+- Show Supabase dashboard
+- Explain PostGIS extension: "Instead of storing lat/lng in separate columns, we use a single GEOGRAPHY column"
+- Run the SQL query from `setup-database.sql`
+- Show the sample data: "5 points representing a route from Algonquin College to downtown Ottawa"
+
+```sql
+-- Show this query in Supabase SQL editor
+SELECT 
+    id,
+    name,
+    ST_AsText(coordinates) as coordinates_text,
+    ST_X(coordinates::geometry) as longitude,
+    ST_Y(coordinates::geometry) as latitude,
+    created_at
+FROM locations 
+ORDER BY created_at;
+```
+
+### 3. **Backend API** (3 minutes)
+- Show the Node.js server code
+- Highlight the PostGIS integration: "We transform coordinates for the frontend"
+- Test the API endpoints:
+  ```bash
+  # In terminal
+  curl http://localhost:5000/api/health
+  curl http://localhost:5000/api/locations
+  ```
+- Show the JSON response with transformed coordinates
+
+### 4. **Frontend Visualization** (4 minutes)
+- Open the React app (http://localhost:3000)
+- Point out the Google Maps integration
+- Show the markers for each GPS point
+- Highlight the polyline connecting the route
+- Demonstrate adding a new location
+- Show real-time updates
+
+### 5. **Technical Benefits** (2 minutes)
+- **PostGIS advantages**: Single field storage, geospatial queries, distance calculations
+- **Modern stack**: React for UI, Node.js for API, Supabase for database
+- **Scalability**: Can handle thousands of GPS points efficiently
+
+## 🎯 Key Talking Points
+
+### **Why PostGIS?**
+- "Traditional approach stores latitude and longitude in separate columns"
+- "PostGIS stores them as a single GEOGRAPHY point, enabling powerful geospatial queries"
+- "We can find nearest locations, calculate distances, and perform spatial joins"
+
+### **API Design**
+- "RESTful endpoints provide clean separation between frontend and database"
+- "JSON responses are optimized for Google Maps consumption"
+- "Error handling ensures robust user experience"
+
+### **Google Maps Integration**
+- "React Google Maps API provides smooth, interactive mapping"
+- "Markers show individual GPS points"
+- "Polylines visualize the complete route"
+- "Real-time updates demonstrate live data flow"
+
+## 🔧 Live Coding Demo (Optional)
+
+If you want to show live coding:
+
+1. **Add a new location via API**:
+   ```bash
+   curl -X POST http://localhost:5000/api/locations \
+     -H "Content-Type: application/json" \
+     -d '{"name": "New Location", "lat": 45.4000, "lng": -75.7000}'
+   ```
+
+2. **Show the database update**:
+   - Refresh the Supabase dashboard
+   - Show the new record in the locations table
+
+3. **Show frontend update**:
+   - Refresh the React app
+   - New marker appears on the map
+   - Polyline updates to include the new point
+
+## 📊 Sample Queries to Show
+
+### **Distance Calculation**
+```sql
+-- Calculate distance between first and last points
+SELECT 
+    ST_Distance(
+        (SELECT coordinates FROM locations ORDER BY created_at LIMIT 1),
+        (SELECT coordinates FROM locations ORDER BY created_at DESC LIMIT 1)
+    ) as distance_meters;
+```
+
+### **Route Length**
+```sql
+-- Calculate total route length
+SELECT ST_Length(ST_MakeLine(coordinates::geometry ORDER BY created_at)) as total_distance_meters
+FROM locations;
+```
+
+### **Nearest Location**
+```sql
+-- Find nearest location to a given point
+SELECT name, ST_Distance(coordinates, ST_GeogFromText('POINT(-75.7000 45.4000)')) as distance_meters
+FROM locations 
+ORDER BY coordinates <-> ST_GeogFromText('POINT(-75.7000 45.4000)')
+LIMIT 1;
+```
+
+## 🎉 Conclusion
+
+- "This demonstrates modern geospatial data handling"
+- "PostGIS provides powerful spatial capabilities"
+- "React and Google Maps create engaging user experiences"
+- "The full stack is production-ready and scalable"
+
+## 🚨 Troubleshooting
+
+### **If the map doesn't load**:
+- Check Google Maps API key
+- Verify API key has Maps JavaScript API enabled
+
+### **If locations don't appear**:
+- Check backend server is running
+- Verify Supabase credentials
+- Check browser console for errors
+
+### **If database queries fail**:
+- Ensure PostGIS extension is enabled
+- Verify the locations table exists
+- Check sample data was inserted
+
+## 📱 Mobile Demo
+
+- The app is responsive and works on mobile
+- Show how the interface adapts to smaller screens
+- Demonstrate touch interactions with the map

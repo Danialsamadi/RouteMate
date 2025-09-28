@@ -1,0 +1,279 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.app-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #ccc;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+
+.controls {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  min-width: 120px;
+  justify-content: center;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  margin-top: 0.5rem;
+}
+
+.btn-secondary {
+  margin-top: 0.5rem;
+}
+
+.btn-success {
+  margin-top: 0.5rem;
+}
+
+.btn-edit {
+  margin-top: 0.5rem;
+}
+
+.btn-delete {
+  margin-top: 0.5rem;
+}
+
+.add-form {
+  padding: 1.5rem;
+  margin: 0 2rem;
+  border: 1px solid #ccc;
+}
+
+.add-form h3 {
+  margin: 0 0 1rem 0;
+}
+
+.add-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.add-form input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.edit-form {
+  padding: 1.5rem;
+  margin: 0 2rem;
+  border: 1px solid #ccc;
+}
+
+.edit-form h3 {
+  margin: 0 0 1rem 0;
+}
+
+.edit-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-form input {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.location-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #ccc;
+  gap: 1rem;
+}
+
+.location-item:last-child {
+  border-bottom: none;
+}
+
+.location-info {
+  flex: 1;
+}
+
+.location-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 2rem;
+  text-align: center;
+}
+
+.error-container h2 {
+  margin-bottom: 1rem;
+}
+
+.error-container code {
+  padding: 0.2rem 0.4rem;
+  font-family: 'Courier New', monospace;
+}
+
+.error-message {
+  padding: 1rem 2rem;
+  margin: 0 2rem;
+  border: 1px solid #ccc;
+}
+
+.map-container {
+  flex: 1;
+  position: relative;
+  max-height: 60vh;
+  min-height: 400px;
+  margin: 1rem;
+  border: 1px solid #ccc;
+}
+
+.info-panel {
+  padding: 1.5rem 2rem;
+  margin: 0 1rem 1rem 1rem;
+  border: 1px solid #ccc;
+}
+
+.info-panel h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+}
+
+.info-panel ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-panel li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.info-panel li:last-child {
+  border-bottom: none;
+}
+
+.info-panel strong {
+  font-weight: 600;
+}
+
+.info-panel small {
+  font-size: 0.85rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.25rem;
+  }
+
+  .controls {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .add-form, .edit-form {
+    margin: 0 1rem;
+  }
+
+  .location-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .location-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .info-panel {
+    padding: 1rem;
+    margin: 0 0.5rem 1rem 0.5rem;
+  }
+
+  .map-container {
+    margin: 0.5rem;
+    max-height: 50vh;
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 0.75rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .map-container {
+    margin: 0.25rem;
+    max-height: 45vh;
+    min-height: 250px;
+  }
+
+  .info-panel {
+    margin: 0 0.25rem 0.5rem 0.25rem;
+    padding: 0.75rem;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "routemate",
+  "version": "1.0.0",
+  "description": "GPS location storage and visualization with Google Maps",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "keywords": ["gps", "maps", "supabase", "postgis", "react"],
+  "author": "RouteMate Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
