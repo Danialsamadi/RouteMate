@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import './App.css';
 
 const API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
-// Default center (Algonquin College)
+// Default center (Ottawa)
 const defaultCenter = {
-  lat: 45.3499,
-  lng: -75.7574
+  lat: 45.4223318,
+  lng: -75.7370025
 };
 
 const mapContainerStyle = {
@@ -32,6 +32,7 @@ function App() {
   const [editForm, setEditForm] = useState({ name: '', lat: '', lng: '' });
   const mapRef = useRef(null);
   const markersRef = useRef([]);
+  const infoWindowRef = useRef(null);
 
   // Fetch locations from API
   const fetchLocations = async () => {
@@ -178,32 +179,58 @@ function App() {
     setEditForm({ name: '', lat: '', lng: '' });
   };
 
-  // Create simple markers using the regular Marker component
-  const createSimpleMarkers = useCallback((map) => {
+  // Create reliable markers that will always show up
+  const createReliableMarkers = useCallback((map) => {
+    console.log('Creating reliable markers...');
+    
     // Clear existing markers
-    markersRef.current.forEach(marker => marker.setMap(null));
+    markersRef.current.forEach(marker => {
+      if (marker.setMap) {
+        marker.setMap(null);
+      }
+    });
     markersRef.current = [];
+
+    // Initialize info window
+    if (!infoWindowRef.current) {
+      infoWindowRef.current = new window.google.maps.InfoWindow();
+    }
 
     if (locations.length === 0) {
       // Create default marker
+      console.log('Creating default marker at:', defaultCenter);
       const defaultMarker = new window.google.maps.Marker({
         map: map,
         position: defaultCenter,
-        title: 'Default Location',
-        label: '1',
+        title: '1. Default Location - Algonquin College',
+        label: {
+          text: '1',
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '14px'
+        },
         icon: {
           url: 'https://maps.google.com/mapfiles/ms/icons/blue-dot.png',
           scaledSize: new window.google.maps.Size(32, 32)
         }
       });
 
+      defaultMarker.addListener('click', () => {
+        console.log('Default marker clicked');
+        infoWindowRef.current.close();
+        infoWindowRef.current.setContent(defaultMarker.title);
+        infoWindowRef.current.open(defaultMarker.map, defaultMarker);
+      });
+
       markersRef.current.push(defaultMarker);
+      console.log('Default marker created and added to map');
       return;
     }
 
     // Create markers for each location
+    console.log(`Creating ${locations.length} location markers`);
     locations.forEach((location, index) => {
-      console.log(`Creating marker for ${location.name}:`, {
+      console.log(`Creating marker ${index + 1} for ${location.name}:`, {
         lat: location.coordinates.lat,
         lng: location.coordinates.lng
       });
@@ -214,20 +241,37 @@ function App() {
           lat: parseFloat(location.coordinates.lat),
           lng: parseFloat(location.coordinates.lng)
         },
-        title: location.name,
-        label: `${index + 1}`,
+        title: `${index + 1}. ${location.name}`,
+        label: {
+          text: `${index + 1}`,
+          color: 'white',
+          fontWeight: 'bold',
+          fontSize: '12px'
+        },
         icon: {
           url: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
-          scaledSize: new window.google.maps.Size(32, 32)
+          scaledSize: new window.google.maps.Size(35, 35)
         }
       });
 
       marker.addListener('click', () => {
         console.log(`Marker clicked: ${location.name}`);
+        infoWindowRef.current.close();
+        infoWindowRef.current.setContent(`
+          <div>
+            <h3>${marker.title}</h3>
+            <p><strong>Coordinates:</strong> ${location.coordinates.lat.toFixed(6)}, ${location.coordinates.lng.toFixed(6)}</p>
+            <p><strong>ID:</strong> ${location.id}</p>
+          </div>
+        `);
+        infoWindowRef.current.open(marker.map, marker);
       });
 
       markersRef.current.push(marker);
+      console.log(`Marker ${index + 1} created and added to map`);
     });
+
+    console.log(`Total markers created: ${markersRef.current.length}`);
   }, [locations]);
 
   useEffect(() => {
@@ -237,9 +281,9 @@ function App() {
   // Update markers when locations change
   useEffect(() => {
     if (mapRef.current && window.google && window.google.maps) {
-      createSimpleMarkers(mapRef.current);
+      createReliableMarkers(mapRef.current);
     }
-  }, [createSimpleMarkers]);
+  }, [createReliableMarkers]);
 
   // Debug: Log when locations change
   console.log('Current locations:', locations);
@@ -375,13 +419,13 @@ function App() {
               console.log('Map zoom:', map.getZoom());
               console.log('Locations to render:', locations.length);
               mapRef.current = map;
-              createSimpleMarkers(map);
+              createReliableMarkers(map);
             }}
             onError={(error) => {
               console.error('Map error:', error);
             }}
           >
-            {/* Markers are created programmatically in createSimpleMarkers function */}
+            {/* Markers are created programmatically in createReliableMarkers function */}
           </GoogleMap>
         </LoadScript>
       </div>
