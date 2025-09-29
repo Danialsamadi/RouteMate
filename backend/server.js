@@ -6,78 +6,6 @@ const { createClient } = require('@supabase/supabase-js');
 // Load environment variables
 dotenv.config();
 
-// Function to decode PostGIS binary format (Well-Known Binary)
-function decodePostGISBinary(hexString) {
-  try {
-    // Convert hex string to buffer
-    const buffer = Buffer.from(hexString, 'hex');
-    
-    // Read the endianness (first byte)
-    const endianness = buffer.readUInt8(0);
-    
-    // Read the geometry type (bytes 1-4, little endian)
-    const geometryType = buffer.readUInt32LE(1);
-    
-    // For POINT geometry (type 1), we need to read the coordinates
-    if (geometryType === 1) {
-      // Skip the header (5 bytes for endianness + type)
-      let offset = 5;
-      
-      // Read X coordinate (double, 8 bytes)
-      const x = buffer.readDoubleLE(offset);
-      offset += 8;
-      
-      // Read Y coordinate (double, 8 bytes)
-      const y = buffer.readDoubleLE(offset);
-      
-      return { lng: x, lat: y };
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error decoding PostGIS binary:', error);
-    return null;
-  }
-}
-
-// Function to parse PostGIS geometry data
-function parsePostGISGeometry(geometryData) {
-  try {
-    // If it's already parsed as an object with coordinates
-    if (geometryData && geometryData.coordinates && Array.isArray(geometryData.coordinates)) {
-      return {
-        lng: geometryData.coordinates[0],
-        lat: geometryData.coordinates[1]
-      };
-    }
-    
-    // If it's a hex string (PostGIS binary format), decode it
-    if (typeof geometryData === 'string' && geometryData.startsWith('0101')) {
-      console.log('📱 PostGIS binary format detected, attempting to decode...');
-      const coords = decodePostGISBinary(geometryData);
-      if (coords) {
-        console.log('✅ Successfully decoded coordinates:', coords);
-        return coords;
-      } else {
-        console.log('❌ Failed to decode PostGIS binary format');
-        return null;
-      }
-    }
-    
-    // If it's an object with x, y properties
-    if (geometryData && typeof geometryData.x === 'number' && typeof geometryData.y === 'number') {
-      return {
-        lng: geometryData.x,
-        lat: geometryData.y
-      };
-    }
-    
-    return null;
-  } catch (error) {
-    console.error('Error parsing PostGIS geometry:', error);
-    return null;
-  }
-}
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -111,9 +39,6 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-
-// Demo data for when Supabase isn't configured
-
 
 // Get all locations
 app.get('/api/locations', async (req, res) => {

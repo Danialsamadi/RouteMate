@@ -62,7 +62,6 @@ function App() {
   // Add new location
   const addLocation = async (e) => {
     e.preventDefault();
-    console.log('Form submitted with data:', newLocation);
     
     if (!newLocation.name || !newLocation.lat || !newLocation.lng) {
       alert('Please fill in all fields');
@@ -70,7 +69,6 @@ function App() {
     }
 
     try {
-      console.log('Sending request to /api/locations');
       const response = await fetch('/api/locations', {
         method: 'POST',
         headers: {
@@ -83,9 +81,7 @@ function App() {
         }),
       });
 
-      console.log('Response status:', response.status);
       const responseData = await response.json();
-      console.log('Response data:', responseData);
 
       if (!response.ok) {
         throw new Error(`Failed to add location: ${responseData.error || 'Unknown error'}`);
@@ -266,7 +262,6 @@ function App() {
 
   // Create reliable markers that will always show up
   const createReliableMarkers = useCallback((map) => {
-    console.log('Creating reliable markers...');
     
     // Clear existing markers
     markersRef.current.forEach(marker => {
@@ -283,7 +278,6 @@ function App() {
 
     if (locations.length === 0) {
       // Create default marker
-      console.log('Creating default marker at:', defaultCenter);
       const defaultMarker = new window.google.maps.Marker({
         map: map,
         position: defaultCenter,
@@ -301,24 +295,17 @@ function App() {
       });
 
       defaultMarker.addListener('click', () => {
-        console.log('Default marker clicked');
         infoWindowRef.current.close();
         infoWindowRef.current.setContent(defaultMarker.title);
         infoWindowRef.current.open(defaultMarker.map, defaultMarker);
       });
 
       markersRef.current.push(defaultMarker);
-      console.log('Default marker created and added to map');
       return;
     }
 
     // Create markers for each location
-    console.log(`Creating ${locations.length} location markers`);
     locations.forEach((location, index) => {
-      console.log(`Creating marker ${index + 1} for ${location.name}:`, {
-        lat: location.coordinates.lat,
-        lng: location.coordinates.lng
-      });
 
       const marker = new window.google.maps.Marker({
         map: map,
@@ -340,7 +327,6 @@ function App() {
       });
 
       marker.addListener('click', () => {
-        console.log(`Marker clicked: ${location.name}`);
         infoWindowRef.current.close();
         infoWindowRef.current.setContent(`
           <div>
@@ -353,10 +339,8 @@ function App() {
       });
 
       markersRef.current.push(marker);
-      console.log(`Marker ${index + 1} created and added to map`);
     });
 
-    console.log(`Total markers created: ${markersRef.current.length}`);
   }, [locations]);
 
   useEffect(() => {
@@ -370,15 +354,6 @@ function App() {
     }
   }, [createReliableMarkers]);
 
-  // Debug: Log when locations change
-  console.log('Current locations:', locations);
-  console.log('API_KEY present:', !!API_KEY);
-  console.log('Locations with coordinates:', locations.map(loc => ({
-    id: loc.id,
-    name: loc.name,
-    lat: loc.coordinates?.lat,
-    lng: loc.coordinates?.lng
-  })));
 
   if (!API_KEY) {
     return (
@@ -420,7 +395,7 @@ function App() {
       {showAddForm && (
         <div className="add-form">
           <h3>Add New Location</h3>
-          <form onSubmit={addLocation} onKeyDown={(e) => console.log('Form keydown:', e.key)}>
+          <form onSubmit={addLocation}>
             <input
               type="text"
               placeholder="Location name"
@@ -444,7 +419,7 @@ function App() {
               onChange={(e) => setNewLocation({...newLocation, lng: e.target.value})}
               required
             />
-            <button type="submit" className="btn btn-success" onClick={() => console.log('Submit button clicked')}>Add Location</button>
+            <button type="submit" className="btn btn-success">Add Location</button>
           </form>
         </div>
       )}
@@ -554,10 +529,6 @@ function App() {
               lng: locations[0].coordinates.lng
             } : defaultCenter}
             onLoad={(map) => {
-              console.log('Map loaded successfully');
-              console.log('Map center:', map.getCenter());
-              console.log('Map zoom:', map.getZoom());
-              console.log('Locations to render:', locations.length);
               mapRef.current = map;
               createReliableMarkers(map);
             }}
