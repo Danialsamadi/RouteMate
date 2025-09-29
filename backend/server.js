@@ -200,6 +200,56 @@ app.post('/api/locations', async (req, res) => {
   }
 });
 
+// Bulk import locations from CSV
+app.post('/api/locations/bulk', async (req, res) => {
+  try {
+    const { locations } = req.body;
+
+    if (!locations || !Array.isArray(locations) || locations.length === 0) {
+      return res.status(400).json({ error: 'Locations array is required and must not be empty' });
+    }
+
+    // Check if Supabase is configured
+    if (!supabase) {
+      return res.status(500).json({ error: 'Database not configured' });
+    }
+
+    // Validate each location
+    for (const location of locations) {
+      if (!location.name || location.lat === undefined || location.lng === undefined) {
+        return res.status(400).json({ 
+          error: `Invalid location data: ${JSON.stringify(location)}. Name, lat, and lng are required.` 
+        });
+      }
+    }
+
+    // Prepare locations for bulk insert
+    const locationsToInsert = locations.map(location => ({
+      name: location.name,
+      coordinates: `POINT(${location.lng} ${location.lat})` // PostGIS format: POINT(longitude latitude)
+    }));
+
+    // Insert all locations at once
+    const { data, error } = await supabase
+      .from('locations')
+      .insert(locationsToInsert)
+      .select();
+
+    if (error) {
+      console.error('Error bulk inserting locations:', error);
+      return res.status(500).json({ error: 'Failed to insert locations' });
+    }
+
+    res.status(201).json({
+      message: `Successfully imported ${data.length} locations`,
+      locations: data
+    });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Delete a location
 app.delete('/api/locations/:id', async (req, res) => {
   try {

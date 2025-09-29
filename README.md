@@ -1,8 +1,8 @@
-# 🗺️ RouteMate - GPS Location Storage & Visualization
+# RouteMate - GPS Location Storage & Visualization
 
 A full-stack application that demonstrates efficient GPS coordinate storage using PostGIS and visualization with Google Maps APIs.
 
-## 🎯 Project Overview
+## Project Overview
 
 This project showcases:
 - **Database**: Supabase (PostgreSQL + PostGIS) for geospatial data storage
@@ -10,14 +10,14 @@ This project showcases:
 - **Frontend**: React + Google Maps for interactive visualization
 - **Features**: GPS coordinate storage, route visualization, and real-time mapping
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 - **Database**: Supabase (PostgreSQL with PostGIS extension)
 - **Backend**: Node.js, Express, Supabase JS Client
 - **Frontend**: React, Google Maps API, @react-google-maps/api
 - **Development**: Concurrently for running both servers
 
-## 🚀 Quick Start
+## Quick Start
 
 1. **Install dependencies**:
    ```bash
@@ -40,7 +40,7 @@ This project showcases:
    npm run dev
    ```
 
-## 📊 Demo Data
+## Demo Data
 
 The application includes sample GPS coordinates for a route from Algonquin College to downtown Ottawa:
 - Algonquin College (45.3499, -75.7574)
@@ -49,14 +49,14 @@ The application includes sample GPS coordinates for a route from Algonquin Colle
 - Parliament Hill (45.4215, -75.6972)
 - Downtown Ottawa (45.4200, -75.6900)
 
-## 🔧 API Endpoints
+## API Endpoints
 
 - `GET /api/health` - Health check
 - `GET /api/locations` - Fetch all GPS locations
 - `POST /api/locations` - Add new GPS location
 - `GET /api/route/:userId` - Get route for specific user
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 RouteMate/
@@ -77,7 +77,7 @@ RouteMate/
 └── README.md             # Project documentation
 ```
 
-## 🎯 Key Features
+## Key Features
 
 ### **PostGIS Integration**
 - Single GEOGRAPHY column stores lat/lng as PostGIS POINT
@@ -94,7 +94,7 @@ RouteMate/
 - React frontend with Google Maps integration
 - Supabase for managed PostgreSQL with PostGIS
 
-## 🧪 Testing
+## Testing
 
 Test the API endpoints:
 ```bash
@@ -110,7 +110,7 @@ curl -X POST http://localhost:5000/api/locations \
   -d '{"name": "Test Location", "lat": 45.4000, "lng": -75.7000}'
 ```
 
-## 📚 Documentation
+## Documentation
 
 - **[SETUP.md](SETUP.md)** - Complete setup guide
 - **[demo.md](demo.md)** - Presentation demo script

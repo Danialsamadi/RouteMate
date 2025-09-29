@@ -30,6 +30,10 @@ function App() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingLocation, setEditingLocation] = useState(null);
   const [editForm, setEditForm] = useState({ name: '', lat: '', lng: '' });
+  const [showCsvImport, setShowCsvImport] = useState(false);
+  const [csvFile, setCsvFile] = useState(null);
+  const [csvPreview, setCsvPreview] = useState([]);
+  const [csvImporting, setCsvImporting] = useState(false);
   const mapRef = useRef(null);
   const markersRef = useRef([]);
   const infoWindowRef = useRef(null);
@@ -179,6 +183,87 @@ function App() {
     setEditForm({ name: '', lat: '', lng: '' });
   };
 
+  // Parse CSV file
+  const parseCSV = (csvText) => {
+    const lines = csvText.split('\n').filter(line => line.trim());
+    
+    const locations = [];
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(value => value.trim());
+      if (values.length >= 4) {
+        locations.push({
+          id: values[0],
+          name: values[1],
+          lat: parseFloat(values[2]),
+          lng: parseFloat(values[3]),
+          address: values[4] || ''
+        });
+      }
+    }
+    return locations;
+  };
+
+  // Handle CSV file upload
+  const handleCsvFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file && file.type === 'text/csv') {
+      setCsvFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const csvText = e.target.result;
+        const parsedLocations = parseCSV(csvText);
+        setCsvPreview(parsedLocations);
+      };
+      reader.readAsText(file);
+    } else {
+      alert('Please select a valid CSV file');
+    }
+  };
+
+  // Import CSV locations
+  const importCsvLocations = async () => {
+    if (csvPreview.length === 0) {
+      alert('No locations to import');
+      return;
+    }
+
+    setCsvImporting(true);
+    try {
+      const response = await fetch('/api/locations/bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ locations: csvPreview }),
+      });
+
+      const responseData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`Failed to import locations: ${responseData.error || 'Unknown error'}`);
+      }
+
+      // Refresh locations
+      await fetchLocations();
+      setShowCsvImport(false);
+      setCsvFile(null);
+      setCsvPreview([]);
+      alert(`Successfully imported ${csvPreview.length} locations!`);
+    } catch (err) {
+      console.error('Error importing CSV:', err);
+      alert(`Failed to import locations: ${err.message}`);
+    } finally {
+      setCsvImporting(false);
+    }
+  };
+
+  // Cancel CSV import
+  const cancelCsvImport = () => {
+    setShowCsvImport(false);
+    setCsvFile(null);
+    setCsvPreview([]);
+  };
+
   // Create reliable markers that will always show up
   const createReliableMarkers = useCallback((map) => {
     console.log('Creating reliable markers...');
@@ -317,6 +402,12 @@ function App() {
             {showAddForm ? 'Cancel' : 'Add Location'}
           </button>
           <button 
+            className="btn btn-success"
+            onClick={() => setShowCsvImport(!showCsvImport)}
+          >
+            {showCsvImport ? 'Cancel' : 'Import CSV'}
+          </button>
+          <button 
             className="btn btn-secondary"
             onClick={fetchLocations}
             disabled={loading}
@@ -390,6 +481,55 @@ function App() {
               <button type="button" className="btn btn-secondary" onClick={cancelEdit}>Cancel</button>
             </div>
           </form>
+        </div>
+      )}
+
+      {showCsvImport && (
+        <div className="add-form">
+          <h3>Import Locations from CSV</h3>
+          <p>Upload a CSV file with the format: id,name,lat,lon,address</p>
+          <div className="csv-upload-section">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleCsvFileUpload}
+              className="csv-file-input"
+            />
+            {csvFile && (
+              <div className="csv-preview">
+                <h4>Preview ({csvPreview.length} locations found):</h4>
+                <div className="csv-preview-list">
+                  {csvPreview.slice(0, 5).map((location, index) => (
+                    <div key={index} className="csv-preview-item">
+                      <strong>{location.name}</strong> - {location.lat}, {location.lng}
+                      {location.address && <span> - {location.address}</span>}
+                    </div>
+                  ))}
+                  {csvPreview.length > 5 && (
+                    <div className="csv-preview-more">
+                      ... and {csvPreview.length - 5} more locations
+                    </div>
+                  )}
+                </div>
+                <div className="csv-import-actions">
+                  <button 
+                    className="btn btn-success"
+                    onClick={importCsvLocations}
+                    disabled={csvImporting}
+                  >
+                    {csvImporting ? 'Importing...' : `Import ${csvPreview.length} Locations`}
+                  </button>
+                  <button 
+                    className="btn btn-secondary"
+                    onClick={cancelCsvImport}
+                    disabled={csvImporting}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
