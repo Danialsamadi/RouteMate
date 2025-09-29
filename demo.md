@@ -1,8 +1,8 @@
-# 🎯 RouteMate Demo Script
+# RouteMate Demo Script
 
 This script outlines how to present the RouteMate project effectively in your presentation.
 
-## 📋 Pre-Demo Checklist
+## Pre-Demo Checklist
 
 - [ ] Supabase project created with PostGIS enabled
 - [ ] Database table created with sample data
@@ -10,8 +10,9 @@ This script outlines how to present the RouteMate project effectively in your pr
 - [ ] Frontend app running (port 3000)
 - [ ] Google Maps API key configured
 - [ ] All dependencies installed
+- [ ] Sample CSV file ready for bulk import demo
 
-## 🎬 Demo Flow (10-15 minutes)
+## Demo Flow (15-20 minutes)
 
 ### 1. **Project Introduction** (2 minutes)
 - "Today I'll demonstrate how to efficiently store GPS coordinates using PostGIS and visualize them with Google Maps"
@@ -47,20 +48,27 @@ ORDER BY created_at;
   ```
 - Show the JSON response with transformed coordinates
 
-### 4. **Frontend Visualization** (4 minutes)
+### 4. **Frontend Visualization** (5 minutes)
 - Open the React app (http://localhost:3000)
 - Point out the Google Maps integration
 - Show the markers for each GPS point
-- Highlight the polyline connecting the route
-- Demonstrate adding a new location
+- Demonstrate adding a new location manually
 - Show real-time updates
 
-### 5. **Technical Benefits** (2 minutes)
+### 5. **CSV Bulk Import Feature** (4 minutes)
+- Click the "Import CSV" button
+- Upload a sample CSV file with multiple locations
+- Show the preview of locations to be imported
+- Demonstrate bulk import functionality
+- Show all locations appearing on the map instantly
+- Explain the efficiency of bulk operations vs manual entry
+
+### 6. **Technical Benefits** (2 minutes)
 - **PostGIS advantages**: Single field storage, geospatial queries, distance calculations
 - **Modern stack**: React for UI, Node.js for API, Supabase for database
 - **Scalability**: Can handle thousands of GPS points efficiently
 
-## 🎯 Key Talking Points
+## Key Talking Points
 
 ### **Why PostGIS?**
 - "Traditional approach stores latitude and longitude in separate columns"
@@ -71,14 +79,21 @@ ORDER BY created_at;
 - "RESTful endpoints provide clean separation between frontend and database"
 - "JSON responses are optimized for Google Maps consumption"
 - "Error handling ensures robust user experience"
+- "Bulk import endpoint handles multiple locations efficiently"
 
 ### **Google Maps Integration**
 - "React Google Maps API provides smooth, interactive mapping"
-- "Markers show individual GPS points"
-- "Polylines visualize the complete route"
+- "Markers show individual GPS points with accessibility features"
+- "Clickable markers with info windows for detailed information"
 - "Real-time updates demonstrate live data flow"
 
-## 🔧 Live Coding Demo (Optional)
+### **CSV Import Functionality**
+- "Bulk import feature allows efficient data entry"
+- "CSV parsing handles standard format with validation"
+- "Preview system shows data before import"
+- "PostGIS bulk insert operations for performance"
+
+## Live Coding Demo (Optional)
 
 If you want to show live coding:
 
@@ -89,16 +104,23 @@ If you want to show live coding:
      -d '{"name": "New Location", "lat": 45.4000, "lng": -75.7000}'
    ```
 
-2. **Show the database update**:
+2. **Bulk import via API**:
+   ```bash
+   curl -X POST http://localhost:5000/api/locations/bulk \
+     -H "Content-Type: application/json" \
+     -d '{"locations": [{"name": "Location 1", "lat": 45.4000, "lng": -75.7000}, {"name": "Location 2", "lat": 45.4100, "lng": -75.7100}]}'
+   ```
+
+3. **Show the database update**:
    - Refresh the Supabase dashboard
-   - Show the new record in the locations table
+   - Show the new records in the locations table
 
-3. **Show frontend update**:
+4. **Show frontend update**:
    - Refresh the React app
-   - New marker appears on the map
-   - Polyline updates to include the new point
+   - New markers appear on the map
+   - Demonstrate CSV import functionality
 
-## 📊 Sample Queries to Show
+## Sample Queries to Show
 
 ### **Distance Calculation**
 ```sql
@@ -126,14 +148,15 @@ ORDER BY coordinates <-> ST_GeogFromText('POINT(-75.7000 45.4000)')
 LIMIT 1;
 ```
 
-## 🎉 Conclusion
+## Conclusion
 
 - "This demonstrates modern geospatial data handling"
 - "PostGIS provides powerful spatial capabilities"
 - "React and Google Maps create engaging user experiences"
+- "Bulk import functionality demonstrates efficient data management"
 - "The full stack is production-ready and scalable"
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### **If the map doesn't load**:
 - Check Google Maps API key
@@ -149,8 +172,14 @@ LIMIT 1;
 - Verify the locations table exists
 - Check sample data was inserted
 
-## 📱 Mobile Demo
+### **If CSV import fails**:
+- Verify CSV format matches expected structure
+- Check file is valid CSV format
+- Ensure all required fields are present
+
+## Mobile Demo
 
 - The app is responsive and works on mobile
 - Show how the interface adapts to smaller screens
 - Demonstrate touch interactions with the map
+- CSV import works on mobile devices

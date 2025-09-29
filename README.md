@@ -1,14 +1,18 @@
-# RouteMate - GPS Location Storage & Visualization
+# RouteMate - Advanced Database Topics Project
 
-A full-stack application that demonstrates efficient GPS coordinate storage using PostGIS and visualization with Google Maps APIs.
+**Course**: CST8276 Advanced Database Topics  
+**Project**: GPS Location Storage & Visualization using PostGIS
+
+A full-stack application that demonstrates advanced database concepts including geospatial data storage using PostGIS and visualization with Google Maps APIs.
 
 ## Project Overview
 
-This project showcases:
-- **Database**: Supabase (PostgreSQL + PostGIS) for geospatial data storage
+This project showcases advanced database topics from CST8276:
+- **Geospatial Data Storage**: PostGIS extension for efficient GPS coordinate storage
+- **Database Architecture**: PostgreSQL with PostGIS for spatial queries
 - **Backend**: Node.js + Express API for data management  
 - **Frontend**: React + Google Maps for interactive visualization
-- **Features**: GPS coordinate storage, route visualization, and real-time mapping
+- **Features**: GPS coordinate storage, route visualization, bulk data import, and real-time mapping
 
 ## Tech Stack
 
@@ -54,7 +58,9 @@ The application includes sample GPS coordinates for a route from Algonquin Colle
 - `GET /api/health` - Health check
 - `GET /api/locations` - Fetch all GPS locations
 - `POST /api/locations` - Add new GPS location
-- `GET /api/route/:userId` - Get route for specific user
+- `POST /api/locations/bulk` - Bulk import multiple locations
+- `PUT /api/locations/:id` - Update existing location
+- `DELETE /api/locations/:id` - Delete location
 
 ## Project Structure
 
@@ -83,16 +89,25 @@ RouteMate/
 - Single GEOGRAPHY column stores lat/lng as PostGIS POINT
 - Enables powerful geospatial queries (distance, nearest neighbor, etc.)
 - More efficient than separate latitude/longitude columns
+- Demonstrates advanced database spatial capabilities
+
+### **Bulk Data Import**
+- CSV file import for efficient data entry
+- Preview system for data validation
+- Bulk database operations for performance
+- Demonstrates data migration and ETL concepts
 
 ### **Real-time Visualization**
 - Interactive Google Maps with markers and polylines
 - Add new locations and see them immediately
 - Responsive design for desktop and mobile
+- Accessibility features for inclusive design
 
 ### **Modern Architecture**
 - RESTful API with proper error handling
 - React frontend with Google Maps integration
 - Supabase for managed PostgreSQL with PostGIS
+- Demonstrates full-stack development practices
 
 ## Testing
 
@@ -108,7 +123,40 @@ curl http://localhost:5000/api/locations
 curl -X POST http://localhost:5000/api/locations \
   -H "Content-Type: application/json" \
   -d '{"name": "Test Location", "lat": 45.4000, "lng": -75.7000}'
+
+# Bulk import locations
+curl -X POST http://localhost:5000/api/locations/bulk \
+  -H "Content-Type: application/json" \
+  -d '{"locations": [{"name": "Location 1", "lat": 45.4000, "lng": -75.7000}, {"name": "Location 2", "lat": 45.4100, "lng": -75.7100}]}'
 ```
+
+## CST8276 Learning Objectives Demonstrated
+
+This project demonstrates key concepts from Advanced Database Topics:
+
+### **Spatial Database Concepts**
+- PostGIS extension for geospatial data storage
+- GEOGRAPHY vs GEOMETRY data types
+- Spatial indexing and query optimization
+- Coordinate system transformations
+
+### **Advanced Query Techniques**
+- Spatial SQL functions (ST_Distance, ST_Within, etc.)
+- Geospatial joins and spatial relationships
+- Performance optimization for spatial queries
+- Bulk data operations and transactions
+
+### **Database Architecture**
+- Extension management in PostgreSQL
+- Spatial data modeling and normalization
+- API design for spatial data access
+- Error handling and data validation
+
+### **Real-world Applications**
+- GPS coordinate storage and retrieval
+- Route planning and optimization
+- Geospatial data visualization
+- Bulk data import and migration
 
 ## Documentation
 
