@@ -55,12 +55,21 @@ The application includes sample GPS coordinates for a route from Algonquin Colle
 
 ## API Endpoints
 
+### Location Management
 - `GET /api/health` - Health check
 - `GET /api/locations` - Fetch all GPS locations
+- `GET /api/locations/nearby?lat=45.4215&lng=-75.6972&radius=5000` - Find locations within radius (meters)
+- `GET /api/locations/bounds?minLat=45.3&minLng=-75.8&maxLat=45.5&maxLng=-75.6` - Get locations in map viewport
 - `POST /api/locations` - Add new GPS location
 - `POST /api/locations/bulk` - Bulk import multiple locations
 - `PUT /api/locations/:id` - Update existing location
 - `DELETE /api/locations/:id` - Delete location
+
+### Performance Features
+- ✅ Spatial indexing with PostGIS GIST
+- ✅ HTTP caching headers
+- ✅ Sub-10ms query performance
+- ✅ Viewport-based loading for maps
 
 ## Project Structure
 

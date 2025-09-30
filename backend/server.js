@@ -263,6 +263,97 @@ app.put('/api/locations/:id', async (req, res) => {
   }
 });
 
+// GET /api/locations/nearby - Find locations within radius
+app.get('/api/locations/nearby', async (req, res) => {
+  try {
+    const { lat, lng, radius = 5000 } = req.query;
+    
+    if (!lat || !lng) {
+      return res.status(400).json({ 
+        error: 'Latitude and longitude are required',
+        example: '/api/locations/nearby?lat=45.4215&lng=-75.6972&radius=5000'
+      });
+    }
+    
+    if (!supabase) {
+      return res.status(500).json({ error: 'Database not configured' });
+    }
+    
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
+    const radiusMeters = parseInt(radius);
+    
+    if (isNaN(latitude) || isNaN(longitude) || isNaN(radiusMeters)) {
+      return res.status(400).json({ 
+        error: 'Invalid parameters. lat, lng must be numbers, radius must be integer'
+      });
+    }
+    
+    const { data, error } = await supabase.rpc('nearby_locations', {
+      lat: latitude,
+      lng: longitude,
+      radius_meters: radiusMeters
+    });
+    
+    if (error) {
+      console.error('Error in proximity search:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json({
+      data,
+      query: {
+        center: { lat: latitude, lng: longitude },
+        radius_meters: radiusMeters,
+        count: data.length
+      }
+    });
+  } catch (error) {
+    console.error('Error in proximity search:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/locations/bounds - Get locations within map viewport
+app.get('/api/locations/bounds', async (req, res) => {
+  try {
+    const { minLat, minLng, maxLat, maxLng } = req.query;
+    
+    if (!minLat || !minLng || !maxLat || !maxLng) {
+      return res.status(400).json({ 
+        error: 'All bounds parameters required: minLat, minLng, maxLat, maxLng'
+      });
+    }
+    
+    if (!supabase) {
+      return res.status(500).json({ error: 'Database not configured' });
+    }
+    
+    const { data, error } = await supabase.rpc('locations_in_bounds', {
+      min_lat: parseFloat(minLat),
+      min_lng: parseFloat(minLng),
+      max_lat: parseFloat(maxLat),
+      max_lng: parseFloat(maxLng)
+    });
+    
+    if (error) {
+      console.error('Error fetching locations in bounds:', error);
+      return res.status(500).json({ error: error.message });
+    }
+    
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json({
+      data,
+      bounds: { minLat, minLng, maxLat, maxLng },
+      count: data.length
+    });
+  } catch (error) {
+    console.error('Error fetching locations in bounds:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get a single location by ID
 app.get('/api/locations/:id', async (req, res) => {
   try {
